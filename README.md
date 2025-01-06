@@ -40,6 +40,35 @@ public class Solution {
                 else
                 {
                     return false;
+
+                    public class Solution {
+    public bool IsPalindrome(int x) {
+        string y = x.ToString();
+        if(y.Length == 1)
+        {
+            return true;  
+        }
+        int i = 0;
+            for(int j = y.Length-1; j <= y.Length-1; j--)
+            {
+                if(y[j]==y[i])
+                {
+                    i++;
+                    if(i == y.Length-1)
+                    {
+                        return true;
+                    }
+                    continue;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;          
+        return false; 
+    }
+}
                 }
             }
             return true;          
