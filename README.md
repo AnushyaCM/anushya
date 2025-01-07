@@ -211,3 +211,201 @@ print("\nData has been saved successfully.")
 # This script performs a variety of functions related to car color management.
 # It includes data analysis, predictive modeling, and visualizations, making it a comprehensive
 # system for understanding car color preferences and trends over time.
+
+import random
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+
+# Step 1: Define college, courses, and students
+
+# Predefined list of colleges
+colleges = ['Harvard', 'MIT', 'Stanford', 'Oxford', 'Cambridge', 'Princeton', 'Yale', 'Columbia']
+
+# Predefined list of courses
+courses = ['Computer Science', 'Mathematics', 'Physics', 'Biology', 'Chemistry', 'History', 'Literature', 'Philosophy']
+
+# Predefined student names
+students = ['Alice', 'Bob', 'Charlie', 'David', 'Emma', 'Fay', 'George', 'Hannah', 'Irene', 'John']
+
+# Step 2: Generate college data
+
+# Create a DataFrame for college data
+college_data = {
+    'College': colleges,
+    'Location': ['USA', 'USA', 'USA', 'UK', 'UK', 'USA', 'USA', 'USA'],
+    'Established': [1636, 1861, 1885, 1096, 1209, 1746, 1701, 1754],
+    'StudentCount': [22000, 11000, 16000, 20000, 19000, 9000, 8000, 12000]
+}
+
+college_df = pd.DataFrame(college_data)
+
+print("\nCollege Data:")
+print(college_df)
+
+# Step 3: Generate student enrollment data
+
+# Generate random student enrollment data
+enrollment_data = []
+for student in students:
+    college = random.choice(colleges)
+    major = random.choice(courses)
+    gpa = round(random.uniform(2.0, 4.0), 2)
+    enrollment_data.append([student, college, major, gpa])
+
+# Create a DataFrame for student enrollment data
+student_df = pd.DataFrame(enrollment_data, columns=['Student', 'College', 'Major', 'GPA'])
+
+print("\nStudent Enrollment Data:")
+print(student_df)
+
+# Step 4: Calculate and track GPAs over time (Simulated Data)
+
+# Simulating GPA changes over time for students
+years = list(range(2020, 2025))
+gpa_changes = {student: [round(random.uniform(2.0, 4.0), 2) for _ in years] for student in students}
+
+# Create a DataFrame to track GPA changes over the years
+gpa_df = pd.DataFrame(gpa_changes, index=years)
+gpa_df.index.name = 'Year'
+
+print("\nSimulated GPA Changes Over Time:")
+print(gpa_df)
+
+# Step 5: Visualize GPA Trends for Students
+plt.figure(figsize=(10, 6))
+for student in students:
+    plt.plot(gpa_df.index, gpa_df[student], label=student)
+
+plt.title("Student GPA Trends Over Time")
+plt.xlabel("Year")
+plt.ylabel("GPA")
+plt.legend(title="Students")
+plt.grid(True)
+plt.show()
+
+# Step 6: Predict student success based on GPA (Machine Learning)
+
+# Prepare data for prediction
+student_df['Passed'] = student_df['GPA'].apply(lambda x: 1 if x >= 2.5 else 0)  # Passed if GPA >= 2.5
+
+# Encoding categorical data (College, Major)
+student_df['College_encoded'] = pd.Categorical(student_df['College']).codes
+student_df['Major_encoded'] = pd.Categorical(student_df['Major']).codes
+
+# Features and target for prediction
+X = student_df[['College_encoded', 'Major_encoded', 'GPA']]
+y = student_df['Passed']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Logistic Regression Model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Step 7: Visualize prediction results with a confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+cm_df = pd.DataFrame(cm, index=['Failed', 'Passed'], columns=['Predicted Failed', 'Predicted Passed'])
+
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm_df, annot=True, fmt='d', cmap='Blues')
+plt.title('Confusion Matrix for Student Success Prediction')
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.show()
+
+# Step 8: Suggest courses based on GPA (Simple recommendation system)
+
+def suggest_courses(gpa):
+    if gpa >= 3.5:
+        return ['Advanced Computer Science', 'Advanced Mathematics', 'Philosophy of Science']
+    elif gpa >= 2.5:
+        return ['Intermediate Physics', 'History of the Modern World', 'Introduction to Psychology']
+    else:
+        return ['Basic Algebra', 'English Composition', 'Introduction to Biology']
+
+# Test the recommendation system for a student
+student_name = 'Alice'
+student_gpa = student_df.loc[student_df['Student'] == student_name, 'GPA'].values[0]
+recommended_courses = suggest_courses(student_gpa)
+
+print(f"\nCourses recommended for {student_name} (GPA: {student_gpa}):")
+for course in recommended_courses:
+    print(f"- {course}")
+
+# Step 9: Visualize Course Enrollment Distribution
+
+# Count the number of students enrolled in each major
+major_counts = student_df['Major'].value_counts()
+
+# Plot the enrollment distribution
+plt.figure(figsize=(8, 6))
+major_counts.plot(kind='bar', color='skyblue')
+plt.title('Course Enrollment Distribution')
+plt.xlabel('Major')
+plt.ylabel('Number of Students')
+plt.xticks(rotation=45)
+plt.show()
+
+# Step 10: Simulate students changing majors
+
+# Simulate random major changes for students
+changed_majors = []
+for student in students:
+    new_major = random.choice([m for m in courses if m != student_df.loc[student_df['Student'] == student, 'Major'].values[0]])
+    changed_majors.append([student, new_major])
+
+# Create a DataFrame for students who changed majors
+changed_majors_df = pd.DataFrame(changed_majors, columns=['Student', 'New Major'])
+
+print("\nStudents Who Changed Majors:")
+print(changed_majors_df)
+
+# Step 11: Tracking Graduating Students
+
+# Assuming students graduate based on a specific GPA threshold
+graduation_criteria = 2.8
+graduating_students = student_df[student_df['GPA'] >= graduation_criteria]
+
+print(f"\nStudents Graduating (GPA >= {graduation_criteria}):")
+print(graduating_students[['Student', 'College', 'GPA']])
+
+# Step 12: Analyzing College Performance Based on Student Success
+
+# Calculate the percentage of students who pass in each college
+college_pass_rate = student_df.groupby('College')['Passed'].mean() * 100
+
+print("\nCollege Pass Rates Based on Student Performance:")
+print(college_pass_rate)
+
+# Step 13: Create a DataFrame for College and Course Performance Analysis
+
+# Simulate the average GPA of each course
+course_avg_gpa = {course: round(random.uniform(2.5, 4.0), 2) for course in courses}
+
+# Create a DataFrame for course GPA analysis
+course_gpa_df = pd.DataFrame(course_avg_gpa, index=['Average GPA']).T
+
+print("\nAverage GPA per Course:")
+print(course_gpa_df)
+
+# Step 14: Saving College Data to CSV Files
+
+college_df.to_csv('colleges.csv', index=False)
+student_df.to_csv('students.csv', index=False)
+
+print("\nData has been saved to CSV files.")
+
+# Final Notes:
+# This Python script manages a wide range of college-related data, including student performance tracking,
+# course enrollment, GPA calculations, and predictive modeling for student success.
+# The script uses pandas, matplotlib, and machine learning to provide useful insights about students and colleges.
+
